@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { providerRouter } from "@/lib/providers/provider-router";
+import { GeoapifyProviderError } from "@/lib/providers/geoapify-provider";
 import { LeadProviderSearchParams } from "@/lib/providers/types";
 
 type RequestBody = Partial<LeadProviderSearchParams>;
@@ -108,7 +109,15 @@ export async function POST(request: Request) {
         offset: params.offset ?? 0,
       },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof GeoapifyProviderError) {
+      return errorResponse(
+        error.statusCode === 429 ? "PROVIDER_ERROR" : "PROVIDER_ERROR",
+        error.publicMessage,
+        error.statusCode
+      );
+    }
+
     return errorResponse(
       "PROVIDER_ERROR",
       "The lead provider could not complete this search.",

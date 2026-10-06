@@ -22,6 +22,7 @@ export interface Lead {
   businessType: string;
   website: string | null;
   phone: string | null;
+  email?: string | null;
   address: string;
   city: string;
   country: string;

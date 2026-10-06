@@ -1,4 +1,5 @@
 import { mockLeadProvider } from "./mock-provider";
+import { geoapifyProvider } from "./geoapify-provider";
 import {
   LeadProvider,
   LeadProviderSearchParams,
@@ -12,12 +13,15 @@ import {
  * provider can be added here later without changing the search experience.
  */
 class ProviderRouter {
-  private readonly provider: LeadProvider = mockLeadProvider;
+  private getProvider(): LeadProvider {
+    return process.env.GEOAPIFY_API_KEY ? geoapifyProvider : mockLeadProvider;
+  }
 
   async search(params: LeadProviderSearchParams): Promise<ProviderSearchResult> {
-    const leads = await this.provider.search(params);
+    const provider = this.getProvider();
+    const leads = await provider.search(params);
     return {
-      provider: this.provider.getName(),
+      provider: provider.getName(),
       leads,
     };
   }
