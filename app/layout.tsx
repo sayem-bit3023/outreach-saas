@@ -3,9 +3,8 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 
 export const metadata: Metadata = {
-  title: "Lead Intelligence — Demo",
-  description:
-    "Find businesses worth contacting. Demo of the Lead Intelligence Platform.",
+  title: "Lead Intelligence",
+  description: "Find businesses worth contacting with server-side lead discovery.",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
-# Lead Intelligence Platform — Demo
+# Lead Intelligence Platform
 
-A polished demo of the **Lead Intelligence** SaaS product for agencies.
+A foundation for the **Lead Intelligence** SaaS product for agencies.
 
 This repository validates the core discovery experience:
 
@@ -18,7 +18,7 @@ Agencies need a reliable way to:
 2. **Understand** why they are potential prospects
 3. Eventually **contact and follow up** with them
 
-This demo focuses exclusively on the **find / search / queue / results / save** loop.  
+This release focuses exclusively on the **find / search / queue / results / save** loop.
 Real lead providers, outreach, and billing are intentionally out of scope.
 
 ---
@@ -32,7 +32,7 @@ Search job enters the queue
         ↓
 Up to 2 jobs process concurrently
         ↓
-MockLeadProvider returns progressive results
+SearchManager makes one provider request per started search
         ↓
 User views results, saves interesting leads
         ↓
@@ -57,22 +57,24 @@ LeadProvider (interface)
 
 The UI never contains provider-specific logic.
 
-### Search job simulation
+### Search job lifecycle
 
-Client-side `SearchManager` simulates an asynchronous job queue:
+Client-side `SearchManager` owns the browser lifecycle and local persistence while
+the server API owns provider access:
 
 - Statuses: `queued` → `searching` → `collecting` → `checking` → `completed` | `cancelled` | `error`
 - Max **2 concurrent** active jobs
 - Queue advances automatically when a job finishes or is cancelled
-- Partial results are kept on cancel
-- Occasional simulated failures with retry
+- One `POST /api/leads/search` request per started search
+- Active requests use `AbortController` and are aborted on cancellation
+- Retry creates one new request with the original parameters
 
 ### Persistence
 
 All state lives in `localStorage`:
 
 - Searches & status
-- Generated leads
+- Normalized provider leads
 - Saved leads
 - Usage (Free plan: 100 discoveries)
 
@@ -94,7 +96,7 @@ This separation is intentional so a future Supabase migration stays straightforw
 - **TypeScript**
 - **Tailwind CSS**
 - **Lucide React** (icons)
-- No separate backend — pure client-side demo
+- Next.js server route for provider access
 
 ---
 
@@ -119,7 +121,10 @@ This existing GitHub repository is ready to import into Vercel:
 4. Vercel detects the Next.js App Router project automatically.
 5. Keep the default build settings and deploy.
 
-No environment variables are required. The current project is a browser-only demo using fictional mock lead data and localStorage; it does not use API keys, external lead providers, authentication, or a database.
+Set `GEOAPIFY_API_KEY` as a server-side environment variable in Vercel for
+Production, Preview, and Development. Development without the key uses the
+Mock Business Directory provider; production fails safely instead of silently
+using mock data.
 
 ---
 
@@ -127,9 +132,9 @@ No environment variables are required. The current project is a browser-only dem
 
 | Limitation | Reason |
 |---|---|
-| Processing runs in the browser | Demo only — no real worker |
+| Search lifecycle runs in the browser | Provider requests run through the Next.js server route |
 | Interrupted jobs become cancelled on refresh | Browser cannot keep background timers |
-| Mock data only | Real providers (Overpass, Google Places, etc.) come later |
+| Geoapify is the current real provider | Mock provider remains available for development/testing |
 | No authentication | Will use Supabase Auth later |
 | Free plan is simulated | No Stripe / billing yet |
 | Usage resets only via Settings | Demo convenience |
@@ -170,7 +175,7 @@ components/
   ui/                 # Shared UI primitives
 lib/
   providers/          # LeadProvider interface + MockLeadProvider
-  search/             # SearchManager (queue + simulation)
+  search/             # SearchManager (queue + one-request lifecycle)
   usage/              # UsageManager
   storage/            # localStorage adapters
   hooks/              # React hooks for state

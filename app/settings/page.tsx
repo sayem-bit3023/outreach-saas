@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const handleClearAll = () => {
     if (
       confirm(
-        "Clear all demo data (searches, leads, saved leads, usage)? This cannot be undone."
+        "Clear all local data (searches, leads, saved leads, usage)? This cannot be undone."
       )
     ) {
       storage.clearAll();
@@ -32,7 +32,7 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Demo preferences and data management
+          Preferences and data management
         </p>
       </div>
 
@@ -43,7 +43,7 @@ export default function SettingsPage() {
           onClick={handleResetUsage}
           className="text-sm font-medium text-slate-600 underline hover:text-slate-900"
         >
-          Reset usage counter (demo only)
+          Reset usage counter
         </button>
       </section>
 
@@ -58,7 +58,7 @@ export default function SettingsPage() {
           onClick={handleClearAll}
           className="h-10 px-4 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
         >
-          Clear all demo data
+          Clear all local data
         </button>
         {cleared && (
           <p className="text-sm text-emerald-600">Data cleared. Reloading…</p>
@@ -66,15 +66,13 @@ export default function SettingsPage() {
       </section>
 
       <section className="space-y-2 rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">About this demo</h2>
+        <h2 className="text-sm font-semibold text-slate-900">About lead discovery</h2>
         <ul className="text-sm text-slate-500 space-y-1.5 list-disc list-inside">
-          <li>Lead discovery is fully simulated in the browser</li>
-          <li>Max 2 concurrent search jobs (queue advances automatically)</li>
+          <li>Searches use the configured server-side lead provider</li>
+          <li>Max 2 concurrent search jobs; queued searches advance automatically</li>
           <li>Free plan: 100 lead discoveries</li>
-          <li>No real providers, auth, or billing</li>
-          <li>
-            Architecture is ready for Supabase + server-side workers later
-          </li>
+          <li>Search history and saved leads are stored in this browser</li>
+          <li>Authentication, billing, and server-side job persistence are not enabled</li>
         </ul>
       </section>
     </div>

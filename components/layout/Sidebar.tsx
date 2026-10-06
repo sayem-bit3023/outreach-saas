@@ -72,7 +72,7 @@ export function Sidebar() {
             <div className="font-semibold text-sm tracking-tight">
               Lead Intelligence
             </div>
-            <div className="text-[11px] text-slate-400">Demo · Free Plan</div>
+            <div className="text-[11px] text-slate-400">Free Plan</div>
           </div>
         </div>
 
@@ -104,9 +104,9 @@ export function Sidebar() {
 
         <div className="px-4 py-4 border-t border-slate-800">
           <div className="text-[11px] text-slate-500 leading-relaxed">
-            Simulated data for demo purposes.
+            Server-side lead provider connected.
             <br />
-            No real providers connected.
+            Search usage is tracked in your browser.
           </div>
         </div>
       </aside>

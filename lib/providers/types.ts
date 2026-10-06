@@ -53,6 +53,7 @@ export interface SearchJob {
   /** Progress 0-100 */
   progress: number;
   statusMessage: string;
+  provider?: string;
   errorMessage?: string;
 }
 

@@ -1,5 +1,8 @@
 import { mockLeadProvider } from "./mock-provider";
-import { geoapifyProvider } from "./geoapify-provider";
+import {
+  geoapifyProvider,
+  GeoapifyProviderError,
+} from "./geoapify-provider";
 import {
   LeadProvider,
   LeadProviderSearchParams,
@@ -14,7 +17,14 @@ import {
  */
 class ProviderRouter {
   private getProvider(): LeadProvider {
-    return process.env.GEOAPIFY_API_KEY ? geoapifyProvider : mockLeadProvider;
+    if (process.env.GEOAPIFY_API_KEY) return geoapifyProvider;
+    if (process.env.NODE_ENV === "production") {
+      throw new GeoapifyProviderError(
+        "The real lead provider is not configured.",
+        502
+      );
+    }
+    return mockLeadProvider;
   }
 
   async search(params: LeadProviderSearchParams): Promise<ProviderSearchResult> {

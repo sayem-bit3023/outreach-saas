@@ -183,7 +183,7 @@ export default function SearchDetailPage({
               </span>
             </h2>
             <p className="text-[11px] text-slate-400">
-              Demo data · simulated signals
+              {search.provider || leads[0]?.source || "Lead provider"} results
             </p>
           </div>
           <LeadTable leads={leads} searchId={search.id} />
