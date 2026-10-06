@@ -1,0 +1,171 @@
+# Lead Intelligence Platform — Demo
+
+A polished demo of the **Lead Intelligence** SaaS product for agencies.
+
+This repository validates the core discovery experience:
+
+```
+FIND → SEARCH → QUEUE → PROCESS → RESULTS → SAVE
+```
+
+---
+
+## Product
+
+Agencies need a reliable way to:
+
+1. **Find** businesses worth contacting
+2. **Understand** why they are potential prospects
+3. Eventually **contact and follow up** with them
+
+This demo focuses exclusively on the **find / search / queue / results / save** loop.  
+Real lead providers, outreach, and billing are intentionally out of scope.
+
+---
+
+## Current Flow
+
+```
+User creates a search (business type + location + count)
+        ↓
+Search job enters the queue
+        ↓
+Up to 2 jobs process concurrently
+        ↓
+MockLeadProvider returns progressive results
+        ↓
+User views results, saves interesting leads
+        ↓
+Usage is charged only for leads actually discovered
+```
+
+Multiple searches can be created without waiting. Extra jobs wait in a queue and automatically start when a slot frees up.
+
+---
+
+## Architecture
+
+### Provider abstraction
+
+```
+LeadProvider (interface)
+    └── MockLeadProvider   ← implemented now
+    └── (future) GooglePlacesProvider
+    └── (future) PrivateCoffeeOverpassProvider
+    └── (future) PremiumProvider
+```
+
+The UI never contains provider-specific logic.
+
+### Search job simulation
+
+Client-side `SearchManager` simulates an asynchronous job queue:
+
+- Statuses: `queued` → `searching` → `collecting` → `checking` → `completed` | `cancelled` | `error`
+- Max **2 concurrent** active jobs
+- Queue advances automatically when a job finishes or is cancelled
+- Partial results are kept on cancel
+- Occasional simulated failures with retry
+
+### Persistence
+
+All state lives in `localStorage`:
+
+- Searches & status
+- Generated leads
+- Saved leads
+- Usage (Free plan: 100 discoveries)
+
+Refreshing the page restores state. In-progress jobs are marked **cancelled** on reload (there is no real background worker in the browser).
+
+### Data separation
+
+```
+Search  ≠  Lead  ≠  SavedLead  ≠  Usage
+```
+
+This separation is intentional so a future Supabase migration stays straightforward.
+
+---
+
+## Tech Stack
+
+- **Next.js 15** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Lucide React** (icons)
+- No separate backend — pure client-side demo
+
+---
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Current Limitations
+
+| Limitation | Reason |
+|---|---|
+| Processing runs in the browser | Demo only — no real worker |
+| Interrupted jobs become cancelled on refresh | Browser cannot keep background timers |
+| Mock data only | Real providers (Overpass, Google Places, etc.) come later |
+| No authentication | Will use Supabase Auth later |
+| Free plan is simulated | No Stripe / billing yet |
+| Usage resets only via Settings | Demo convenience |
+
+---
+
+## Future Architecture
+
+```
+Next.js (App Router)
+    +
+Supabase (Auth, Postgres, Realtime)
+    +
+Server-side Lead Providers
+    +
+Background Workers / Queue (e.g. Inngest, Trigger.dev, or custom)
+    +
+Email finding, verification, AI qualification
+    +
+Outreach sequences & reply tracking
+    +
+Stripe billing
+```
+
+The current code is structured so `LocalStorage*` repositories can be replaced with `Supabase*` implementations without rewriting the UI or job orchestration concepts.
+
+---
+
+## Project Structure
+
+```
+app/                  # Next.js App Router pages
+components/
+  dashboard/          # Stats cards
+  search/             # Form, cards, progress, cancel dialog
+  leads/              # Table, row, card
+  layout/             # Sidebar
+  ui/                 # Shared UI primitives
+lib/
+  providers/          # LeadProvider interface + MockLeadProvider
+  search/             # SearchManager (queue + simulation)
+  usage/              # UsageManager
+  storage/            # localStorage adapters
+  hooks/              # React hooks for state
+data/
+  mock-leads.ts       # Fictional business dataset
+```
+
+---
+
+## License
+
+Private demo — all rights reserved.
