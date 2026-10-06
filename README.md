@@ -109,6 +109,20 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Deploying to Vercel
+
+This existing GitHub repository is ready to import into Vercel:
+
+1. Open [Vercel](https://vercel.com/) and choose **Add New Project**.
+2. Connect GitHub if it is not connected yet.
+3. Select the existing `sayemw838-cmyk/outreach-saas` repository.
+4. Vercel detects the Next.js App Router project automatically.
+5. Keep the default build settings and deploy.
+
+No environment variables are required. The current project is a browser-only demo using fictional mock lead data and localStorage; it does not use API keys, external lead providers, authentication, or a database.
+
+---
+
 ## Current Limitations
 
 | Limitation | Reason |
