@@ -2,9 +2,7 @@ import {
   SearchJob,
   Lead,
   SearchStatus,
-  LeadProvider,
 } from "@/lib/providers/types";
-import { mockLeadProvider } from "@/lib/providers/mock-provider";
 import { storage } from "@/lib/storage/local-storage";
 
 const MAX_CONCURRENT = 2;
@@ -39,7 +37,6 @@ class SearchManager {
   private leads: Record<string, Lead> = {};
   private listeners: Set<Listener> = new Set();
   private timers: Map<string, ReturnType<typeof setTimeout>> = new Map();
-  private provider: LeadProvider = mockLeadProvider;
   private initialized = false;
 
   init() {
@@ -222,12 +219,29 @@ class SearchManager {
       const take = Math.min(batchSize, remaining);
 
       try {
-        const batch = await this.provider.search({
-          businessType: current.businessType,
-          location: current.location,
-          limit: take,
-          offset: processed,
+        const response = await fetch("/api/leads/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            businessType: current.businessType,
+            location: current.location,
+            limit: take,
+            offset: processed,
+          }),
         });
+
+        const payload = (await response.json()) as {
+          results?: Lead[];
+          error?: { message?: string };
+        };
+
+        if (!response.ok || !Array.isArray(payload.results)) {
+          throw new Error(
+            payload.error?.message || "The lead provider could not complete this search."
+          );
+        }
+
+        const batch = payload.results;
 
         // Store leads
         const newIds: string[] = [];

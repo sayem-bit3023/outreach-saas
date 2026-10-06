@@ -75,6 +75,11 @@ export interface LeadProviderSearchParams {
   offset?: number;
 }
 
+export interface ProviderSearchResult {
+  provider: string;
+  leads: Lead[];
+}
+
 export interface LeadProvider {
   search(params: LeadProviderSearchParams): Promise<Lead[]>;
   getName(): string;

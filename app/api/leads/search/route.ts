@@ -1,0 +1,118 @@
+import { NextResponse } from "next/server";
+import { providerRouter } from "@/lib/providers/provider-router";
+import { LeadProviderSearchParams } from "@/lib/providers/types";
+
+type RequestBody = Partial<LeadProviderSearchParams>;
+
+type ErrorCode = "INVALID_REQUEST" | "PROVIDER_ERROR" | "INTERNAL_ERROR";
+
+function errorResponse(
+  code: ErrorCode,
+  message: string,
+  status: number
+): NextResponse {
+  return NextResponse.json(
+    {
+      error: {
+        code,
+        message,
+      },
+    },
+    { status }
+  );
+}
+
+function isRequestBody(value: unknown): value is RequestBody {
+  return typeof value === "object" && value !== null;
+}
+
+function validateRequest(body: RequestBody): string | null {
+  if (
+    typeof body.businessType !== "string" ||
+    body.businessType.trim().length < 1 ||
+    body.businessType.trim().length > 100
+  ) {
+    return "businessType must be a non-empty string no longer than 100 characters.";
+  }
+
+  if (
+    typeof body.location !== "string" ||
+    body.location.trim().length < 1 ||
+    body.location.trim().length > 200
+  ) {
+    return "location must be a non-empty string no longer than 200 characters.";
+  }
+
+  if (
+    typeof body.limit !== "number" ||
+    !Number.isInteger(body.limit) ||
+    body.limit < 1 ||
+    body.limit > 250
+  ) {
+    return "limit must be an integer between 1 and 250.";
+  }
+
+  if (
+    body.offset !== undefined &&
+    (typeof body.offset !== "number" ||
+      !Number.isInteger(body.offset) ||
+      body.offset < 0)
+  ) {
+    return "offset must be a non-negative integer when provided.";
+  }
+
+  return null;
+}
+
+export async function POST(request: Request) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse(
+      "INVALID_REQUEST",
+      "Request body must be valid JSON.",
+      400
+    );
+  }
+
+  if (!isRequestBody(body)) {
+    return errorResponse(
+      "INVALID_REQUEST",
+      "Request body must be a JSON object.",
+      400
+    );
+  }
+
+  const validationError = validateRequest(body);
+  if (validationError) {
+    return errorResponse("INVALID_REQUEST", validationError, 400);
+  }
+
+  const params: LeadProviderSearchParams = {
+    businessType: body.businessType!.trim(),
+    location: body.location!.trim(),
+    limit: body.limit!,
+    offset: body.offset,
+  };
+
+  try {
+    const result = await providerRouter.search(params);
+
+    return NextResponse.json({
+      provider: result.provider,
+      results: result.leads,
+      meta: {
+        count: result.leads.length,
+        offset: params.offset ?? 0,
+      },
+    });
+  } catch {
+    return errorResponse(
+      "PROVIDER_ERROR",
+      "The lead provider could not complete this search.",
+      502
+    );
+  }
+}
