@@ -52,7 +52,16 @@ interface GeoapifyPlacesResponse {
 export class GeoapifyProviderError extends Error {
   constructor(
     public readonly publicMessage: string,
-    public readonly statusCode: 422 | 429 | 502 = 502
+    public readonly statusCode: 422 | 429 | 502 = 502,
+    public readonly code:
+      | "GEOCODING_ERROR"
+      | "PROVIDER_AUTH_ERROR"
+      | "PROVIDER_RATE_LIMIT"
+      | "PROVIDER_HTTP_ERROR"
+      | "PROVIDER_MALFORMED_RESPONSE"
+      | "PROVIDER_EMPTY_RESULT"
+      | "NETWORK_ERROR"
+      | "INTERNAL_ERROR" = "PROVIDER_HTTP_ERROR"
   ) {
     super(publicMessage);
     this.name = "GeoapifyProviderError";
@@ -66,7 +75,9 @@ const CATEGORY_MAP: Record<string, string> = {
   cafe: "catering.cafe",
   "coffee shop": "catering.cafe",
   hotel: "accommodation.hotel",
-  "real estate agency": "commercial.real_estate",
+  // Geoapify exposes estate agencies under both office and service. The
+  // former commercial.real_estate value is not a valid Places category.
+  "real estate agency": "office.estate_agent,service.estate_agent",
   plumber: "service.plumber",
   lawyer: "service.lawyer",
 };
@@ -171,26 +182,30 @@ async function fetchJson<T>(url: URL): Promise<T> {
   } catch {
     throw new GeoapifyProviderError(
       "The lead provider could not be reached. Please try again.",
-      502
+      502,
+      "NETWORK_ERROR"
     );
   }
 
   if (response.status === 401 || response.status === 403) {
     throw new GeoapifyProviderError(
       "The lead provider is not configured correctly.",
-      502
+      502,
+      "PROVIDER_AUTH_ERROR"
     );
   }
   if (response.status === 429) {
     throw new GeoapifyProviderError(
       "The lead provider rate limit was reached. Please try again later.",
-      429
+      429,
+      "PROVIDER_RATE_LIMIT"
     );
   }
   if (!response.ok) {
     throw new GeoapifyProviderError(
       "The lead provider returned an error. Please try again.",
-      502
+      502,
+      "PROVIDER_HTTP_ERROR"
     );
   }
 
@@ -199,7 +214,8 @@ async function fetchJson<T>(url: URL): Promise<T> {
   } catch {
     throw new GeoapifyProviderError(
       "The lead provider returned an invalid response.",
-      502
+      502,
+      "PROVIDER_MALFORMED_RESPONSE"
     );
   }
 }
@@ -214,7 +230,8 @@ export class GeoapifyProvider implements LeadProvider {
     if (!apiKey) {
       throw new GeoapifyProviderError(
         "The Geoapify provider is not configured.",
-        502
+        502,
+        "PROVIDER_AUTH_ERROR"
       );
     }
 
@@ -233,7 +250,8 @@ export class GeoapifyProvider implements LeadProvider {
     if (!location || typeof location.lat !== "number" || typeof location.lon !== "number") {
       throw new GeoapifyProviderError(
         "We could not find that location. Try a city and country.",
-        422
+        422,
+        "GEOCODING_ERROR"
       );
     }
 

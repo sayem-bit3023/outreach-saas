@@ -5,7 +5,17 @@ import { LeadProviderSearchParams } from "@/lib/providers/types";
 
 type RequestBody = Partial<LeadProviderSearchParams>;
 
-type ErrorCode = "INVALID_REQUEST" | "PROVIDER_ERROR" | "INTERNAL_ERROR";
+type ErrorCode =
+  | "INVALID_REQUEST"
+  | "PROVIDER_ERROR"
+  | "INTERNAL_ERROR"
+  | "GEOCODING_ERROR"
+  | "PROVIDER_AUTH_ERROR"
+  | "PROVIDER_RATE_LIMIT"
+  | "PROVIDER_HTTP_ERROR"
+  | "PROVIDER_MALFORMED_RESPONSE"
+  | "PROVIDER_EMPTY_RESULT"
+  | "NETWORK_ERROR";
 
 function errorResponse(
   code: ErrorCode,
@@ -111,8 +121,14 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof GeoapifyProviderError) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[LeadProvider] request failed", {
+          category: error.code,
+          statusCode: error.statusCode,
+        });
+      }
       return errorResponse(
-        error.statusCode === 429 ? "PROVIDER_ERROR" : "PROVIDER_ERROR",
+        error.code,
         error.publicMessage,
         error.statusCode
       );

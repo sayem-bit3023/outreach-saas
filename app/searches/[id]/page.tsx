@@ -2,13 +2,14 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSearch } from "@/lib/hooks/use-search";
 import { useSearches } from "@/lib/hooks/use-search";
 import { SearchProgress } from "@/components/search/SearchProgress";
 import { SearchStatusBadge } from "@/components/ui/SearchStatusBadge";
 import { LeadTable } from "@/components/leads/LeadTable";
 import { CancelSearchDialog } from "@/components/search/CancelSearchDialog";
-import { formatDate } from "@/lib/utils";
+import { formatDate, pluralizeBusinessType } from "@/lib/utils";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -28,6 +29,8 @@ export default function SearchDetailPage({
   const { search, leads } = useSearch(id);
   const { cancelSearch, retrySearch } = useSearches();
   const [showCancel, setShowCancel] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const router = useRouter();
 
   if (!search) {
     return (
@@ -70,7 +73,7 @@ export default function SearchDetailPage({
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
-                {search.businessType}s in {search.location}
+                {pluralizeBusinessType(search.businessType)} in {search.location}
               </h1>
               <SearchStatusBadge status={search.status} />
             </div>
@@ -92,11 +95,18 @@ export default function SearchDetailPage({
             )}
             {search.status === "error" && (
               <button
-                onClick={() => retrySearch(search.id)}
+                disabled={retrying}
+                onClick={() => {
+                  if (retrying) return;
+                  setRetrying(true);
+                  const nextJob = retrySearch(search.id);
+                  if (nextJob) router.push(`/searches/${nextJob.id}`);
+                  else setRetrying(false);
+                }}
                 className="inline-flex items-center gap-1.5 h-9 px-3 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800"
               >
                 <RotateCcw className="w-4 h-4" />
-                Retry
+                {retrying ? "Retrying…" : "Retry"}
               </button>
             )}
           </div>
@@ -111,7 +121,9 @@ export default function SearchDetailPage({
           <div className="flex items-start gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 mt-0.5" />
             <div>
-              <h2 className="font-semibold text-slate-900">Search Complete</h2>
+                <h2 className="font-semibold text-slate-900">
+                  {search.processedLeads === 0 ? "No Results Found" : "Search Complete"}
+                </h2>
               <p className="text-sm text-slate-500 mt-0.5">
                 {search.requestedLeads} requested · {search.processedLeads}{" "}
                 found

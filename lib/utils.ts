@@ -22,3 +22,9 @@ export function formatRelative(iso: string): string {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
+
+export function pluralizeBusinessType(businessType: string): string {
+  if (businessType === "Real Estate Agency") return "Real Estate Agencies";
+  if (businessType.endsWith("s")) return businessType;
+  return `${businessType}s`;
+}
