@@ -276,10 +276,20 @@ class SearchManager {
   }
 
   retrySearch(id: string): SearchJob | null {
-    const old = this.getSearch(id);
-    if (!old || old.status !== "error") return null;
+    const job = this.getSearch(id);
+    if (!job || job.status !== "error" || this.controllers.has(id)) return null;
 
-    return this.createSearch(old.businessType, old.location, old.requestedLeads);
+    // Retry the same job so search history does not accumulate duplicate
+    // records. The next queue slot starts exactly one new provider request.
+    this.updateJob(id, {
+      status: "queued",
+      completedAt: null,
+      progress: job.processedLeads > 0 ? job.progress : 0,
+      statusMessage: STATUS_MESSAGES.queued,
+      errorMessage: undefined,
+    });
+    this.advanceQueue();
+    return this.getSearch(id) ?? null;
   }
 
   private consumeUsage(count: number) {

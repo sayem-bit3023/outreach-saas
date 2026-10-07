@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SearchJob } from "@/lib/providers/types";
@@ -20,6 +20,10 @@ export function SearchCard({ search, onCancel, onRetry }: Props) {
   const [showCancel, setShowCancel] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (search.status !== "error") setRetrying(false);
+  }, [search.status]);
 
   const isActive = ["searching", "collecting", "checking", "queued"].includes(
     search.status
@@ -88,7 +92,9 @@ export function SearchCard({ search, onCancel, onRetry }: Props) {
                 if (retrying) return;
                 setRetrying(true);
                 const nextJob = onRetry(search.id);
-                if (nextJob) router.push(`/searches/${nextJob.id}`);
+                if (nextJob && nextJob.id !== search.id) {
+                  router.push(`/searches/${nextJob.id}`);
+                }
                 else setRetrying(false);
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"

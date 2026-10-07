@@ -18,7 +18,7 @@ import {
   Globe,
   Phone,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SearchDetailPage({
   params,
@@ -31,6 +31,10 @@ export default function SearchDetailPage({
   const [showCancel, setShowCancel] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (search?.status !== "error") setRetrying(false);
+  }, [search?.status]);
 
   if (!search) {
     return (
@@ -100,7 +104,9 @@ export default function SearchDetailPage({
                   if (retrying) return;
                   setRetrying(true);
                   const nextJob = retrySearch(search.id);
-                  if (nextJob) router.push(`/searches/${nextJob.id}`);
+                  if (nextJob && nextJob.id !== search.id) {
+                    router.push(`/searches/${nextJob.id}`);
+                  }
                   else setRetrying(false);
                 }}
                 className="inline-flex items-center gap-1.5 h-9 px-3 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800"
