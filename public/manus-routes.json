@@ -4,6 +4,7 @@
     { "path": "/find-leads", "title": "Find Leads" },
     { "path": "/searches", "title": "Searches" },
     { "path": "/searches/:id", "title": "Search Results" },
+    { "path": "/searches/:id/format", "title": "Customize Results" },
     { "path": "/saved-leads", "title": "Saved Leads" },
     { "path": "/settings", "title": "Settings" }
   ]

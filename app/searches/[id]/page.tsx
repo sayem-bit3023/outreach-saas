@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   X,
   RotateCcw,
+  SlidersHorizontal,
   Globe,
   Phone,
 } from "lucide-react";
@@ -61,6 +62,7 @@ export default function SearchDetailPage({
   const withWebsite = leads.filter((l) => l.hasWebsite).length;
   const withPhone = leads.filter((l) => l.hasPhone).length;
   const unique = leads.length;
+  const canFormat = isDone && leads.length > 0;
 
   return (
     <div className="space-y-6">
@@ -88,6 +90,15 @@ export default function SearchDetailPage({
           </div>
 
           <div className="flex flex-wrap gap-2">
+            {canFormat && (
+              <Link
+                href={`/searches/${search.id}/format`}
+                className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Customize Results
+              </Link>
+            )}
             {isActive && (
               <button
                 onClick={() => setShowCancel(true)}
