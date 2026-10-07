@@ -68,7 +68,9 @@ export function getFormatterField(id: FormatterFieldId) {
 export function dedupeLeads(leads: Lead[]): Lead[] {
   const seen = new Set<string>();
   return leads.filter((lead) => {
-    const key = lead.id || `${lead.source}:${lead.sourceId}`;
+    const key = lead.source && lead.sourceId
+      ? `${lead.source}:${lead.sourceId}`
+      : lead.id;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

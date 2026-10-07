@@ -51,7 +51,9 @@ export function ResultFormatter({ searchId, businessType, location, leads }: Pro
   const uniqueLeads = useMemo(() => {
     const seen = new Set<string>();
     return leads.filter((lead) => {
-      const key = lead.id || `${lead.source}:${lead.sourceId}`;
+      const key = lead.source && lead.sourceId
+        ? `${lead.source}:${lead.sourceId}`
+        : lead.id;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
