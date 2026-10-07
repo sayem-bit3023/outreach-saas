@@ -27,7 +27,7 @@ export default function SearchesPage() {
     if (items.length === 0) return null;
     return (
       <section>
-        <h2 className="text-sm font-semibold text-slate-900 mb-3">
+        <h2 className="text-sm font-medium text-slate-900 mb-3">
           {title}{" "}
           <span className="text-slate-400 font-normal">({items.length})</span>
         </h2>
@@ -49,7 +49,7 @@ export default function SearchesPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">
             Searches
           </h1>
           <p className="text-sm text-slate-500 mt-1">

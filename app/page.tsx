@@ -27,7 +27,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">
             Dashboard
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Active Searches */}
           <section>
-            <h2 className="text-sm font-semibold text-slate-900 mb-3">
+            <h2 className="text-sm font-medium text-slate-900 mb-3">
               Active Searches
             </h2>
             {!ready ? (
@@ -83,7 +83,7 @@ export default function DashboardPage() {
           {/* Recent Searches */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-medium text-slate-900">
                 Recent Searches
               </h2>
               <Link
@@ -118,7 +118,7 @@ export default function DashboardPage() {
           {/* Recent Saved */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-medium text-slate-900">
                 Recent Saved Leads
               </h2>
               <Link

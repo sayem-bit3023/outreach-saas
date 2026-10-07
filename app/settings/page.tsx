@@ -28,7 +28,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8 max-w-xl">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+        <h1 className="text-2xl font-medium text-slate-900 tracking-tight">
           Settings
         </h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -37,7 +37,7 @@ export default function SettingsPage() {
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-900">Usage</h2>
+        <h2 className="text-sm font-medium text-slate-900">Usage</h2>
         <UsageMeter />
         <button
           onClick={handleResetUsage}
@@ -48,7 +48,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-900">Data</h2>
+        <h2 className="text-sm font-medium text-slate-900">Data</h2>
         <p className="text-sm text-slate-500">
           All data is stored in your browser&apos;s localStorage. Refreshing
           the page preserves searches, results, and saved leads. In-progress
@@ -66,7 +66,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="space-y-2 rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">About lead discovery</h2>
+        <h2 className="text-sm font-medium text-slate-900">About lead discovery</h2>
         <ul className="text-sm text-slate-500 space-y-1.5 list-disc list-inside">
           <li>Searches use the configured server-side lead provider</li>
           <li>Max 2 concurrent search jobs; queued searches advance automatically</li>

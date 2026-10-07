@@ -23,7 +23,7 @@ export default function FormatSearchPage({ params }: { params: Promise<{ id: str
           <ArrowLeft className="h-4 w-4" /> Back to search
         </Link>
         <div className="rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center">
-          <h1 className="font-semibold text-slate-900">No results to format</h1>
+          <h1 className="font-medium text-slate-900">No results to format</h1>
           <p className="mt-1 text-sm text-slate-500">Formatter and export become available after this search returns at least one lead.</p>
         </div>
       </div>
@@ -36,8 +36,8 @@ export default function FormatSearchPage({ params }: { params: Promise<{ id: str
         <Link href={`/searches/${id}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-4">
           <ArrowLeft className="h-4 w-4" /> Back to results
         </Link>
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{search.processedLeads} results available</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{pluralizeBusinessType(search.businessType)} in {search.location}</h1>
+        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">{search.processedLeads} results available</p>
+        <h1 className="mt-1 text-2xl font-medium tracking-tight text-slate-900">{pluralizeBusinessType(search.businessType)} in {search.location}</h1>
         {search.status !== "completed" && <p className="mt-1 text-sm text-amber-700">These are partial results from a {search.status === "error" ? "failed" : "cancelled"} search.</p>}
       </div>
       <ResultFormatter searchId={search.id} businessType={search.businessType} location={search.location} leads={leads} />

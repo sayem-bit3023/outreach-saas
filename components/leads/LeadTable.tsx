@@ -25,19 +25,19 @@ export function LeadTable({ leads, searchId }: Props) {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/80">
-              <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th className="py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Business
               </th>
-              <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">
+              <th className="py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider hidden md:table-cell">
                 Contact
               </th>
-              <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">
+              <th className="py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider hidden lg:table-cell">
                 Location
               </th>
-              <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">
+              <th className="py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider hidden sm:table-cell">
                 Signals
               </th>
-              <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
+              <th className="py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider text-right">
                 Action
               </th>
             </tr>

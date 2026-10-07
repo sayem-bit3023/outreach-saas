@@ -80,7 +80,7 @@ export default function SearchDetailPage({
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+              <h1 className="text-2xl font-medium text-slate-900 tracking-tight">
                 {pluralizeBusinessType(search.businessType)} in {search.location}
               </h1>
               <SearchStatusBadge status={search.status} />
@@ -154,7 +154,7 @@ export default function SearchDetailPage({
           <div className="flex items-start gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 mt-0.5" />
             <div>
-                <h2 className="font-semibold text-slate-900">
+                <h2 className="font-medium text-slate-900">
                   {search.processedLeads === 0 ? "No Results Found" : "Search Complete"}
                 </h2>
               <p className="text-sm text-slate-500 mt-0.5">
@@ -167,7 +167,7 @@ export default function SearchDetailPage({
 
         {search.status === "cancelled" && (
           <div>
-            <h2 className="font-semibold text-slate-900">Search Cancelled</h2>
+            <h2 className="font-medium text-slate-900">Search Cancelled</h2>
             <p className="text-sm text-slate-500 mt-0.5">
               {search.processedLeads} lead
               {search.processedLeads !== 1 ? "s" : ""} found before cancellation
@@ -177,7 +177,7 @@ export default function SearchDetailPage({
 
         {search.status === "error" && (
           <div>
-            <h2 className="font-semibold text-red-700">Search Failed</h2>
+            <h2 className="font-medium text-red-700">Search Failed</h2>
             <p className="text-sm text-slate-500 mt-0.5">
               {search.errorMessage ||
                 "The lead provider could not complete this search."}
@@ -188,27 +188,27 @@ export default function SearchDetailPage({
         {isDone && leads.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
             <div>
-              <div className="text-lg font-semibold text-slate-900 tabular-nums">
+              <div className="text-lg font-medium text-slate-900 tabular-nums">
                 {unique}
               </div>
               <div className="text-xs text-slate-500">Unique leads</div>
             </div>
             <div>
-              <div className="text-lg font-semibold text-slate-900 tabular-nums flex items-center gap-1">
+              <div className="text-lg font-medium text-slate-900 tabular-nums flex items-center gap-1">
                 <Globe className="w-3.5 h-3.5 text-slate-400" />
                 {withWebsite}
               </div>
               <div className="text-xs text-slate-500">With websites</div>
             </div>
             <div>
-              <div className="text-lg font-semibold text-slate-900 tabular-nums flex items-center gap-1">
+              <div className="text-lg font-medium text-slate-900 tabular-nums flex items-center gap-1">
                 <Phone className="w-3.5 h-3.5 text-slate-400" />
                 {withPhone}
               </div>
               <div className="text-xs text-slate-500">With phone</div>
             </div>
             <div>
-              <div className="text-lg font-semibold text-slate-900 tabular-nums">
+              <div className="text-lg font-medium text-slate-900 tabular-nums">
                 {search.requestedLeads}
               </div>
               <div className="text-xs text-slate-500">Requested</div>
@@ -221,7 +221,7 @@ export default function SearchDetailPage({
       {(leads.length > 0 || isDone) && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-900">
+            <h2 className="text-sm font-medium text-slate-900">
               Results{" "}
               <span className="text-slate-400 font-normal">
                 ({leads.length})

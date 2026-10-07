@@ -16,7 +16,7 @@ export function CancelSearchDialog({ search, onConfirm, onCancel }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
       <div className="relative bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-2">
+        <h2 className="text-lg font-medium text-slate-900 mb-2">
           Cancel this search?
         </h2>
         <p className="text-sm text-slate-600 mb-1">

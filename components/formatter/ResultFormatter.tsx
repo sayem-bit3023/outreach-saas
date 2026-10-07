@@ -103,8 +103,8 @@ export function ResultFormatter({ searchId, businessType, location, leads }: Pro
       <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Customize Results</p>
-            <h2 className="mt-1 text-lg font-semibold text-slate-900">Choose the information to focus on</h2>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Customize Results</p>
+            <h2 className="mt-1 text-lg font-medium text-slate-900">Choose the information to focus on</h2>
             <p className="mt-1 text-sm text-slate-500">Formatting uses only the results already returned for this search.</p>
           </div>
           <div className="shrink-0 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
@@ -128,7 +128,7 @@ export function ResultFormatter({ searchId, businessType, location, leads }: Pro
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (
             <fieldset key={category} className="rounded-lg border border-slate-200 p-3">
-              <legend className="px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">{category}</legend>
+              <legend className="px-1 text-xs font-medium uppercase tracking-wider text-slate-400">{category}</legend>
               <div className="mt-2 space-y-2">
                 {FORMATTER_FIELDS.filter((field) => field.category === category).map((field) => (
                   <label key={field.id} className="flex min-h-10 cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-slate-50">
@@ -150,7 +150,7 @@ export function ResultFormatter({ searchId, businessType, location, leads }: Pro
       <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
+            <h2 className="text-lg font-medium text-slate-900">Preview</h2>
             <p className="text-sm text-slate-500">{selectedFields.length} fields selected · {uniqueLeads.length} unique leads</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -169,7 +169,7 @@ export function ResultFormatter({ searchId, businessType, location, leads }: Pro
           <div className="mt-5 overflow-x-auto rounded-lg border border-slate-200">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                <tr>{fields.map((field) => <th key={field.id} className="whitespace-nowrap border-b border-slate-200 px-3 py-3 font-semibold">{field.label}</th>)}</tr>
+                <tr>{fields.map((field) => <th key={field.id} className="whitespace-nowrap border-b border-slate-200 px-3 py-3 font-medium">{field.label}</th>)}</tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
                 {rows.map((row, index) => (

@@ -69,7 +69,7 @@ export function DashboardStats() {
               </span>
               <Icon className={`w-4 h-4 ${c.color}`} />
             </div>
-            <div className="text-2xl sm:text-3xl font-semibold text-slate-900 tabular-nums">
+            <div className="text-2xl sm:text-3xl font-medium text-slate-900 tabular-nums">
               {c.value.toLocaleString()}
             </div>
           </div>

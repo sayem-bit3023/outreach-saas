@@ -33,7 +33,7 @@ export function UsageMeter({ compact = false }: { compact?: boolean }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
           Free Plan
         </span>
         <span

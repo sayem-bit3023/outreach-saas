@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { providerRouter } from "@/lib/providers/provider-router";
 import { GeoapifyProviderError } from "@/lib/providers/geoapify-provider";
 import { LeadProviderSearchParams } from "@/lib/providers/types";
+import { MIN_LEAD_COUNT, MAX_LEAD_COUNT } from "@/lib/search/limits";
 
 type RequestBody = Partial<LeadProviderSearchParams>;
 
@@ -57,10 +58,10 @@ function validateRequest(body: RequestBody): string | null {
   if (
     typeof body.limit !== "number" ||
     !Number.isInteger(body.limit) ||
-    body.limit < 1 ||
-    body.limit > 250
+    body.limit < MIN_LEAD_COUNT ||
+    body.limit > MAX_LEAD_COUNT
   ) {
-    return "limit must be an integer between 1 and 250.";
+    return `limit must be an integer between ${MIN_LEAD_COUNT} and ${MAX_LEAD_COUNT}.`;
   }
 
   if (
@@ -75,6 +76,9 @@ function validateRequest(body: RequestBody): string | null {
   if (body.brief !== undefined) {
     if (typeof body.brief !== "object" || body.brief === null) {
       return "brief must be an object when provided.";
+    }
+    if (body.brief.resultCount !== undefined && (typeof body.brief.resultCount !== "number" || !Number.isInteger(body.brief.resultCount) || body.brief.resultCount < MIN_LEAD_COUNT || body.brief.resultCount > MAX_LEAD_COUNT)) {
+      return `brief.resultCount must be an integer between ${MIN_LEAD_COUNT} and ${MAX_LEAD_COUNT}.`;
     }
     if (body.brief.goal !== undefined && (typeof body.brief.goal !== "string" || body.brief.goal.length > 300)) {
       return "brief.goal must be a string no longer than 300 characters.";

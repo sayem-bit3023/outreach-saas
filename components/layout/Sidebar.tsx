@@ -35,7 +35,7 @@ export function Sidebar() {
           <div className="w-7 h-7 rounded-md bg-slate-900 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-slate-900 text-sm">
+          <span className="font-medium text-slate-900 text-sm">
             Lead Intelligence
           </span>
         </div>
@@ -69,7 +69,7 @@ export function Sidebar() {
             <Sparkles className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
-            <div className="font-semibold text-sm tracking-tight">
+            <div className="font-medium text-sm tracking-tight">
               Lead Intelligence
             </div>
             <div className="text-[11px] text-slate-400">Free Plan</div>

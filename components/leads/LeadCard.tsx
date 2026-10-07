@@ -27,7 +27,7 @@ export function LeadCard({ lead, searchId }: Props) {
     <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="font-semibold text-slate-900">{lead.businessName}</h3>
+          <h3 className="font-medium text-slate-900">{lead.businessName}</h3>
           <p className="text-xs text-slate-500 mt-0.5">{lead.businessType}</p>
         </div>
         <button

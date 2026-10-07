@@ -15,6 +15,7 @@ import {
   QUALIFICATION_STYLES,
 } from "@/lib/search-brief";
 import { Search, AlertCircle, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { MIN_LEAD_COUNT, MAX_LEAD_COUNT } from "@/lib/search/limits";
 
 const BUSINESS_TYPES: BusinessType[] = [
   "Dentist",
@@ -60,7 +61,8 @@ export function SearchForm() {
     if (!businessType) return "Please choose a business type.";
     if (!location.trim()) return "Please enter a location.";
     if (businessType === "Custom" && !customType.trim()) return "Please enter a custom business type.";
-    if (requestedLeads === "" || !Number.isInteger(requestedLeads) || requestedLeads < 1 || requestedLeads > 250) return "Enter a lead count between 1 and 250.";
+    if (requestedLeads === "" || !Number.isInteger(requestedLeads) || requestedLeads < MIN_LEAD_COUNT || requestedLeads > MAX_LEAD_COUNT) return `Enter a lead count between ${MIN_LEAD_COUNT} and ${MAX_LEAD_COUNT}.`;
+    if (remaining < MIN_LEAD_COUNT) return `You need at least ${MIN_LEAD_COUNT} lead discoveries to search, but you have ${remaining} remaining.`;
     if (!canAfford(requestedLeads)) return `You only have ${remaining} lead discoveries remaining.`;
     return null;
   };
@@ -109,7 +111,7 @@ export function SearchForm() {
 
   const reduceSize = () => {
     if (remaining > 0) {
-      setRequestedLeads(Math.min(remaining, 250));
+      setRequestedLeads(Math.min(remaining, MAX_LEAD_COUNT));
       setError(null);
     }
   };
@@ -131,8 +133,8 @@ export function SearchForm() {
             <ArrowLeft className="h-4 w-4" /> Edit search inputs
           </button>
           <div className="mb-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Search Brief</p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-900">Help focus this search</h2>
+            <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Search Brief</p>
+            <h2 className="mt-1 text-xl font-medium tracking-tight text-slate-900">Help focus this search</h2>
             <p className="mt-1 text-sm text-slate-500">A few optional preferences are saved for future searches. They do not trigger another API request or consume credits.</p>
           </div>
 
@@ -171,9 +173,9 @@ export function SearchForm() {
               <label className="mb-1.5 block text-sm font-medium text-slate-700">How selective should the results be?</label>
               <div className="grid gap-2 sm:grid-cols-3">
                 {QUALIFICATION_STYLES.map((style) => (
-                  <button key={style.value} type="button" onClick={() => setPreferences((current) => ({ ...current, qualificationStyle: style.value as QualificationStyle }))} className={`min-h-16 rounded-lg border px-3 py-2 text-left transition-colors ${preferences.qualificationStyle === style.value ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}>
+                  <button key={style.value} type="button" onClick={() => setPreferences((current) => ({ ...current, qualificationStyle: style.value as QualificationStyle }))} className={`min-h-16 rounded-lg border px-3 py-2 text-left transition-colors ${preferences.qualificationStyle === style.value ? "border-slate-300 bg-slate-50 text-slate-800 shadow-sm" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}>
                     <span className="block text-sm font-medium">{style.label}</span>
-                    <span className={`mt-0.5 block text-xs ${preferences.qualificationStyle === style.value ? "text-slate-300" : "text-slate-500"}`}>{style.description}</span>
+                    <span className="mt-0.5 block text-xs text-slate-500">{style.description}</span>
                   </button>
                 ))}
               </div>
@@ -189,8 +191,8 @@ export function SearchForm() {
         <div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Review Brief</p>
-              <p className="mt-1 text-sm text-slate-700"><strong>{effectiveType}</strong> in <strong>{location.trim()}</strong> · {requestedLeads} leads</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Review Brief</p>
+              <p className="mt-1 text-sm text-slate-700"><span className="font-medium text-slate-800">{effectiveType}</span> in <span className="font-medium text-slate-800">{location.trim()}</span> · {requestedLeads} leads</p>
               <p className="mt-1 text-xs text-slate-500">{preferences.qualificationStyle || "Balanced"} · {currentPriorities.length ? currentPriorities.join(" · ") : "No priorities selected"}</p>
             </div>
             <button type="button" onClick={handleFindLeads} disabled={submitting} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60">
@@ -221,11 +223,11 @@ export function SearchForm() {
 
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700">Number of Leads</label>
-          <input required type="number" min={1} max={250} value={requestedLeads} onChange={(e) => { setRequestedLeads(e.target.value ? Number(e.target.value) : ""); setError(null); }} placeholder="Enter a count (1–250)" className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10" />
-          <p className="mt-2 text-xs text-slate-500">Choose how many lead discoveries this search may use. You have {remaining} remaining.</p>
+          <input required type="number" min={MIN_LEAD_COUNT} max={MAX_LEAD_COUNT} value={requestedLeads} onChange={(e) => { setRequestedLeads(e.target.value ? Number(e.target.value) : ""); setError(null); }} placeholder={`Enter a count (${MIN_LEAD_COUNT}–${MAX_LEAD_COUNT})`} className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10" />
+          <p className="mt-2 text-xs text-slate-500">Choose between {MIN_LEAD_COUNT} and {MAX_LEAD_COUNT} lead discoveries for this search. You have {remaining} remaining.</p>
         </div>
 
-        {error && <div className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><div className="flex-1"><p className="text-sm text-amber-800">{error}</p>{requestedLeads !== "" && !canAfford(requestedLeads) && <div className="mt-2 flex gap-2"><button type="button" onClick={reduceSize} className="text-xs font-medium text-amber-800 underline">Reduce Search Size</button><button type="button" disabled className="text-xs font-medium text-slate-500">View Plan</button></div>}</div></div>}
+        {error && <div className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><div className="flex-1"><p className="text-sm text-amber-800">{error}</p>{requestedLeads !== "" && !canAfford(requestedLeads) && remaining >= MIN_LEAD_COUNT && <div className="mt-2 flex gap-2"><button type="button" onClick={reduceSize} className="text-xs font-medium text-amber-800 underline">Reduce Search Size</button><button type="button" disabled className="text-xs font-medium text-slate-500">View Plan</button></div>}</div></div>}
 
         <button type="submit" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-sm font-medium text-white transition-colors hover:bg-slate-800"><ArrowRight className="h-4 w-4" /> Continue</button>
       </div>

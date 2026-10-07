@@ -14,7 +14,7 @@ export default function FindLeadsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+        <h1 className="text-2xl font-medium text-slate-900 tracking-tight">
           Find Leads
         </h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -30,7 +30,7 @@ export default function FindLeadsPage() {
           <UsageMeter />
           {active.length > 0 && (
             <div>
-              <h2 className="text-sm font-semibold text-slate-900 mb-3">
+              <h2 className="text-sm font-medium text-slate-900 mb-3">
                 Currently Running
               </h2>
               <div className="space-y-3">
