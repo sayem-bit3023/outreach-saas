@@ -13,7 +13,7 @@ import { X, Eye, RotateCcw, MapPin } from "lucide-react";
 interface Props {
   search: SearchJob;
   onCancel: (id: string) => void;
-  onRetry?: (id: string) => SearchJob | null;
+  onRetry: (id: string) => SearchJob | null;
 }
 
 export function SearchCard({ search, onCancel, onRetry }: Props) {
@@ -85,8 +85,9 @@ export function SearchCard({ search, onCancel, onRetry }: Props) {
             </Link>
           )}
 
-          {search.status === "error" && onRetry && (
+          {search.status === "error" && (
             <button
+              type="button"
               disabled={retrying}
               onClick={() => {
                 if (retrying) return;
@@ -97,7 +98,8 @@ export function SearchCard({ search, onCancel, onRetry }: Props) {
                 }
                 else setRetrying(false);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              aria-label={retrying ? "Retrying search" : "Retry search"}
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:cursor-wait disabled:opacity-60"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               {retrying ? "Retrying…" : "Retry"}

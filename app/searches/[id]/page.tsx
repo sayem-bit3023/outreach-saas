@@ -87,7 +87,7 @@ export default function SearchDetailPage({
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {isActive && (
               <button
                 onClick={() => setShowCancel(true)}
@@ -99,6 +99,7 @@ export default function SearchDetailPage({
             )}
             {search.status === "error" && (
               <button
+                type="button"
                 disabled={retrying}
                 onClick={() => {
                   if (retrying) return;
@@ -109,7 +110,8 @@ export default function SearchDetailPage({
                   }
                   else setRetrying(false);
                 }}
-                className="inline-flex items-center gap-1.5 h-9 px-3 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800"
+                aria-label={retrying ? "Retrying search" : "Retry search"}
+                className="inline-flex min-h-10 shrink-0 items-center gap-1.5 h-10 px-3 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60"
               >
                 <RotateCcw className="w-4 h-4" />
                 {retrying ? "Retrying…" : "Retry"}

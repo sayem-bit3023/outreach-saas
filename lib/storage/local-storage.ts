@@ -24,7 +24,14 @@ function safeParse<T>(raw: string | null, fallback: T): T {
 export const storage = {
   getSearches(): SearchJob[] {
     if (typeof window === "undefined") return [];
-    return safeParse(localStorage.getItem(KEYS.searches), []);
+    const searches = safeParse<SearchJob[]>(localStorage.getItem(KEYS.searches), []);
+    // Older builds persisted provider failures as `failed`; normalize that
+    // legacy value so the current Failed section and Retry action still work.
+    return searches.map((search) =>
+      (search.status as string) === "failed"
+        ? { ...search, status: "error", statusMessage: search.statusMessage || "Search failed" }
+        : search
+    );
   },
 
   setSearches(searches: SearchJob[]): void {
