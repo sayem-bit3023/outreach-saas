@@ -1,4 +1,4 @@
-import { SearchJob, Lead, SearchStatus } from "@/lib/providers/types";
+import { SearchJob, Lead, SearchStatus, SearchBrief } from "@/lib/providers/types";
 import { storage } from "@/lib/storage/local-storage";
 
 const MAX_CONCURRENT = 2;
@@ -109,7 +109,8 @@ class SearchManager {
   createSearch(
     businessType: string,
     location: string,
-    requestedLeads: number
+    requestedLeads: number,
+    brief: SearchBrief
   ): SearchJob {
     const id =
       typeof crypto !== "undefined" && crypto.randomUUID
@@ -129,6 +130,7 @@ class SearchManager {
       leadIds: [],
       progress: 0,
       statusMessage: STATUS_MESSAGES.queued,
+      brief,
     };
 
     this.searches = [job, ...this.searches];
@@ -193,6 +195,7 @@ class SearchManager {
           location: job.location,
           limit: job.requestedLeads,
           offset: 0,
+          brief: job.brief,
         }),
       });
 

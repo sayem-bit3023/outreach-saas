@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { SearchJob, Lead } from "@/lib/providers/types";
+import { SearchJob, Lead, SearchBrief } from "@/lib/providers/types";
 import { searchManager } from "@/lib/search/search-manager";
 
 export function useSearches() {
@@ -18,8 +18,8 @@ export function useSearches() {
   }, []);
 
   const createSearch = useCallback(
-    (businessType: string, location: string, requestedLeads: number) => {
-      return searchManager.createSearch(businessType, location, requestedLeads);
+    (businessType: string, location: string, requestedLeads: number, brief: SearchBrief) => {
+      return searchManager.createSearch(businessType, location, requestedLeads, brief);
     },
     []
   );

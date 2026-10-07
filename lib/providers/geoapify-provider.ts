@@ -87,6 +87,11 @@ function categoryFor(businessType: string): string {
   return CATEGORY_MAP[normalized] ?? "commercial";
 }
 
+function labelFor(businessType: string): string {
+  const normalized = businessType.trim().toLowerCase().replace(/\s+/g, " ");
+  return normalized === "custom" ? "Business" : businessType;
+}
+
 function stringValue(...values: unknown[]): string | null {
   const value = values.find(
     (candidate): candidate is string =>
@@ -156,7 +161,7 @@ function normalizeLead(
   return {
     id: `geoapify_${sourceId}`,
     businessName: name,
-    businessType: requestedBusinessType,
+    businessType: labelFor(requestedBusinessType),
     website,
     phone,
     ...(email ? { email } : {}),

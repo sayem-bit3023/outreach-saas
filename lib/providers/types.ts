@@ -16,6 +16,18 @@ export type SearchStatus =
   | "cancelled"
   | "error";
 
+export type QualificationStyle = "broad" | "balanced" | "strict";
+
+export interface SearchBrief {
+  businessType: string;
+  location: string;
+  resultCount: number;
+  goal?: string;
+  priorities?: string[];
+  qualificationStyle?: QualificationStyle;
+  additionalInstruction?: string;
+}
+
 export interface Lead {
   id: string;
   businessName: string;
@@ -55,6 +67,7 @@ export interface SearchJob {
   statusMessage: string;
   provider?: string;
   errorMessage?: string;
+  brief?: SearchBrief;
 }
 
 export interface SavedLead {
@@ -75,6 +88,8 @@ export interface LeadProviderSearchParams {
   limit: number;
   /** Offset for progressive fetching simulation */
   offset?: number;
+  /** Preserved search intent for future qualification; providers may ignore it. */
+  brief?: SearchBrief;
 }
 
 export interface ProviderSearchResult {

@@ -72,6 +72,24 @@ function validateRequest(body: RequestBody): string | null {
     return "offset must be a non-negative integer when provided.";
   }
 
+  if (body.brief !== undefined) {
+    if (typeof body.brief !== "object" || body.brief === null) {
+      return "brief must be an object when provided.";
+    }
+    if (body.brief.goal !== undefined && (typeof body.brief.goal !== "string" || body.brief.goal.length > 300)) {
+      return "brief.goal must be a string no longer than 300 characters.";
+    }
+    if (body.brief.additionalInstruction !== undefined && (typeof body.brief.additionalInstruction !== "string" || body.brief.additionalInstruction.length > 1000)) {
+      return "brief.additionalInstruction must be a string no longer than 1000 characters.";
+    }
+    if (body.brief.priorities !== undefined && (!Array.isArray(body.brief.priorities) || body.brief.priorities.some((item) => typeof item !== "string" || item.length > 100))) {
+      return "brief.priorities must be an array of short strings.";
+    }
+    if (body.brief.qualificationStyle !== undefined && !["broad", "balanced", "strict"].includes(body.brief.qualificationStyle)) {
+      return "brief.qualificationStyle is invalid.";
+    }
+  }
+
   return null;
 }
 
@@ -106,6 +124,7 @@ export async function POST(request: Request) {
     location: body.location!.trim(),
     limit: body.limit!,
     offset: body.offset,
+    brief: body.brief,
   };
 
   try {

@@ -10,6 +10,7 @@ import { SearchStatusBadge } from "@/components/ui/SearchStatusBadge";
 import { LeadTable } from "@/components/leads/LeadTable";
 import { CancelSearchDialog } from "@/components/search/CancelSearchDialog";
 import { formatDate, pluralizeBusinessType } from "@/lib/utils";
+import { summarizeBrief } from "@/lib/search-brief";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -63,6 +64,7 @@ export default function SearchDetailPage({
   const withPhone = leads.filter((l) => l.hasPhone).length;
   const unique = leads.length;
   const canFormat = isDone && leads.length > 0;
+  const briefSummary = summarizeBrief(search.brief);
 
   return (
     <div className="space-y-6">
@@ -131,6 +133,18 @@ export default function SearchDetailPage({
           </div>
         </div>
       </div>
+
+      {search.brief && (
+        <details className="rounded-xl border border-slate-200 bg-white px-4 py-3 sm:px-5">
+          <summary className="cursor-pointer list-none text-sm font-medium text-slate-700">Search Brief</summary>
+          <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3 text-sm text-slate-500 sm:grid-cols-3">
+            <p><span className="font-medium text-slate-700">Goal:</span> {search.brief.goal || "Not specified"}</p>
+            <p><span className="font-medium text-slate-700">Priorities:</span> {briefSummary[1] || "None"}</p>
+            <p><span className="font-medium text-slate-700">Selectivity:</span> {briefSummary[0] || "Balanced"}</p>
+            {search.brief.additionalInstruction && <p className="sm:col-span-3"><span className="font-medium text-slate-700">Instruction:</span> {search.brief.additionalInstruction}</p>}
+          </div>
+        </details>
+      )}
 
       {/* Progress / Summary */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">

@@ -3,6 +3,7 @@ import {
   Lead,
   SavedLead,
   UsageState,
+  SearchBrief,
 } from "@/lib/providers/types";
 
 const KEYS = {
@@ -10,6 +11,7 @@ const KEYS = {
   leads: "li_leads",
   saved: "li_saved_leads",
   usage: "li_usage",
+  briefPreferences: "li_search_brief_preferences",
 } as const;
 
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -73,6 +75,18 @@ export const storage = {
   setUsage(usage: UsageState): void {
     if (typeof window === "undefined") return;
     localStorage.setItem(KEYS.usage, JSON.stringify(usage));
+  },
+
+  getBriefPreferences(): Pick<SearchBrief, "goal" | "priorities" | "qualificationStyle" | "additionalInstruction"> {
+    if (typeof window === "undefined") return {};
+    return safeParse(localStorage.getItem(KEYS.briefPreferences), {});
+  },
+
+  setBriefPreferences(
+    preferences: Pick<SearchBrief, "goal" | "priorities" | "qualificationStyle" | "additionalInstruction">
+  ): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(KEYS.briefPreferences, JSON.stringify(preferences));
   },
 
   clearAll(): void {

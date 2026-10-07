@@ -294,7 +294,6 @@ export function filterMockLeads(
 
   let filtered = MOCK_LEADS.filter((lead) => {
     const typeMatch =
-      typeLower === "custom" ||
       lead.businessType.toLowerCase() === typeLower ||
       lead.businessType.toLowerCase().includes(typeLower);
 
@@ -306,17 +305,6 @@ export function filterMockLeads(
 
     return typeMatch && locMatch;
   });
-
-  // If too few matches, relax location slightly for demo richness
-  if (filtered.length < limit) {
-    filtered = MOCK_LEADS.filter((lead) => {
-      const typeMatch =
-        typeLower === "custom" ||
-        lead.businessType.toLowerCase() === typeLower ||
-        lead.businessType.toLowerCase().includes(typeLower);
-      return typeMatch;
-    });
-  }
 
   // Deterministic shuffle based on type+location so same search feels consistent
   const seed = (businessType + location).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
