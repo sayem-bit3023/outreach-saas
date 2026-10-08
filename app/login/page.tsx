@@ -89,7 +89,7 @@ export default function LoginPage() {
         router.replace(nextPath);
         router.refresh();
       } else {
-        setNotice("If this address can register, a confirmation email is on its way. Confirm it, then sign in.");
+        setNotice("Registration received. Check your inbox for an email verification link to activate your account. After confirming, you can return here to sign in.");
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Authentication could not be completed.");
