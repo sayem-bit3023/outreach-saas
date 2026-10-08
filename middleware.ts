@@ -13,9 +13,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const publicProduction = process.env.VERCEL_ENV === "production";
   const config = getSupabaseConfig();
   if (!config) {
-    return NextResponse.next({ request });
+    if (publicProduction) return NextResponse.next({ request });
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "?setup=missing";
+    return NextResponse.redirect(loginUrl);
   }
 
   let response = NextResponse.next({ request });
@@ -36,12 +41,24 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Public app pages can be browsed without an account. Keep refreshing an
-  // existing Supabase session, but let each API route enforce its own auth and quota.
-  try {
-    await supabase.auth.getClaims();
-  } catch {
-    // Authentication outages must not block public page navigation.
+  if (publicProduction) {
+    // Public production pages can be browsed without an account. Keep refreshing
+    // sessions when available; API routes still enforce auth and quota.
+    try {
+      await supabase.auth.getClaims();
+    } catch {
+      // Authentication outages must not block public page navigation.
+    }
+    return response;
+  }
+
+  const { data, error } = await supabase.auth.getClaims();
+  if (error || !data?.claims) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;
