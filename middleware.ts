@@ -15,10 +15,7 @@ export async function middleware(request: NextRequest) {
 
   const config = getSupabaseConfig();
   if (!config) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.search = "?setup=missing";
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.next({ request });
   }
 
   let response = NextResponse.next({ request });
@@ -39,13 +36,12 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.search = "";
-    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+  // Public app pages can be browsed without an account. Keep refreshing an
+  // existing Supabase session, but let each API route enforce its own auth and quota.
+  try {
+    await supabase.auth.getClaims();
+  } catch {
+    // Authentication outages must not block public page navigation.
   }
 
   return response;

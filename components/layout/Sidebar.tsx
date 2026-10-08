@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   Sparkles,
+  LogIn,
   LogOut,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -122,21 +123,36 @@ export function Sidebar() {
         </nav>
 
         <div className="border-t border-slate-800 px-4 py-4">
-          {email && <p className="mb-3 truncate text-xs text-slate-400" title={email}>{email}</p>}
-          <button
-            type="button"
-            onClick={handleSignOut}
-            disabled={signingOut}
-            className="mb-3 inline-flex min-h-9 items-center gap-2 rounded-md px-2 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
-          >
-            <LogOut className="h-4 w-4" />
-            {signingOut ? "Signing out…" : "Sign out"}
-          </button>
+          {email ? (
+            <>
+              <p className="mb-3 truncate text-xs text-slate-400" title={email}>{email}</p>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="mb-3 inline-flex min-h-9 items-center gap-2 rounded-md px-2 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
+              >
+                <LogOut className="h-4 w-4" />
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="mb-3 inline-flex min-h-9 items-center gap-2 rounded-md px-2 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
+            >
+              <LogIn className="h-4 w-4" />
+              Sign in to search
+            </Link>
+          )}
           {authError && <p role="alert" className="mb-2 text-xs text-red-300">{authError}</p>}
           <div className="text-[11px] leading-relaxed text-slate-500">
-            Server-side lead provider connected.
-            <br />
-            Lifetime usage is enforced per account.
+            {email ? (
+              <>Server-side lead provider connected.<br />Lifetime usage is enforced per account.</>
+            ) : (
+              <>Sign in to start new searches.<br />Usage is enforced per account.</>
+            )}
           </div>
         </div>
       </aside>

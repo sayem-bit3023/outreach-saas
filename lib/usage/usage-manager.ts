@@ -69,7 +69,7 @@ class UsageManager {
         if (generation !== this.generation) return;
         if (!response.ok) {
           const message = response.status === 401
-            ? "Your session could not be verified. Sign in again."
+            ? "Sign in to view your lifetime allowance and run new searches."
             : "Usage could not be loaded. Refresh to try again.";
           this.usage = { ...this.usage, loading: false, error: message };
           return;
