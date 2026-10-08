@@ -4,7 +4,7 @@ import { useUsage } from "@/lib/hooks/use-usage";
 import { cn } from "@/lib/utils";
 
 export function UsageMeter({ compact = false }: { compact?: boolean }) {
-  const { usage, remaining, loading, error } = useUsage();
+  const { usage, remaining, loading, error, refresh } = useUsage();
   const pct = Math.min(100, Math.round(((usage.used + usage.reserved) / usage.limit) * 100));
   const nearLimit = remaining <= 20;
 
@@ -18,8 +18,16 @@ export function UsageMeter({ compact = false }: { compact?: boolean }) {
 
   if (error) {
     return (
-      <div className={compact ? "text-xs text-amber-700" : "rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"}>
-        {error}
+      <div className={compact ? "flex items-center gap-2 text-xs text-amber-700" : "rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"} role="status">
+        <span>{error}</span>
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          disabled={loading}
+          className={compact ? "shrink-0 underline underline-offset-2" : "mt-2 block text-xs font-medium underline underline-offset-2"}
+        >
+          Retry
+        </button>
       </div>
     );
   }

@@ -54,12 +54,17 @@ class UsageManager {
     if (this.refreshPromise) return this.refreshPromise;
 
     const generation = this.generation;
+    this.usage = { ...this.usage, loading: true, error: undefined };
+    this.notify();
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 12_000);
     const pending = (async () => {
       try {
         const response = await fetch("/api/usage", {
           method: "GET",
           cache: "no-store",
           credentials: "same-origin",
+          signal: controller.signal,
         });
         if (generation !== this.generation) return;
         if (!response.ok) {
@@ -94,10 +99,13 @@ class UsageManager {
           this.usage = {
             ...this.usage,
             loading: false,
-            error: "Usage could not be loaded. Refresh to try again.",
+            error: controller.signal.aborted
+              ? "Checking lifetime usage timed out. Check your connection and retry."
+              : "Usage could not be loaded. Please try again.",
           };
         }
       } finally {
+        window.clearTimeout(timeoutId);
         if (generation === this.generation) {
           this.notify();
           this.refreshPromise = null;

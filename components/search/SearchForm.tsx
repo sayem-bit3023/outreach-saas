@@ -35,7 +35,12 @@ const BUSINESS_TYPES: BusinessType[] = [
 export function SearchForm() {
   const router = useRouter();
   const { createSearch } = useSearches();
-  const { remaining, loading: usageLoading, error: usageError } = useUsage();
+  const {
+    remaining,
+    loading: usageLoading,
+    error: usageError,
+    refresh: refreshUsage,
+  } = useUsage();
   const submitLock = useRef(false);
 
   const [businessType, setBusinessType] = useState("");
@@ -236,6 +241,16 @@ export function SearchForm() {
             {RESULT_COUNT_OPTIONS.map((count) => <option key={count} value={count}>{count} results</option>)}
           </select>
           <p className="mt-2 text-xs text-slate-500">One search requests this many businesses; the provider may return fewer if fewer matches are available. {usageLoading ? "Checking your lifetime allowance…" : usageError ? usageError : `You have ${remaining} of 100 lifetime discoveries remaining. Choose a count no greater than your remaining allowance; otherwise no provider request will be made.`}</p>
+          {usageError && (
+            <button
+              type="button"
+              onClick={() => void refreshUsage()}
+              disabled={usageLoading}
+              className="mt-2 inline-flex min-h-8 items-center text-xs font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Retry allowance check
+            </button>
+          )}
         </div>
 
         {error && <div role="alert" className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><p className="text-sm text-amber-800">{error}</p></div>}
