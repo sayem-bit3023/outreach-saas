@@ -1,7 +1,19 @@
 import { SearchJob, Lead, SearchStatus, SearchBrief } from "@/lib/providers/types";
 import { storage } from "@/lib/storage/local-storage";
+import { usageManager } from "@/lib/usage/usage-manager";
 
 const MAX_CONCURRENT = 2;
+
+function newAttemptId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
+    const random = Math.floor(Math.random() * 16);
+    return (character === "x" ? random : (random & 0x3) | 0x8).toString(16);
+  });
+}
+
 const ACTIVE_STATUSES: SearchStatus[] = [
   "searching",
   "collecting",
@@ -119,6 +131,7 @@ class SearchManager {
 
     const job: SearchJob = {
       id,
+      attemptId: newAttemptId(),
       businessType,
       location,
       requestedLeads,
@@ -184,13 +197,17 @@ class SearchManager {
       this.controllers.delete(id);
       return;
     }
+    const attemptId = job.attemptId || newAttemptId();
+    if (job.attemptId !== attemptId) this.updateJob(id, { attemptId });
 
     try {
       const response = await fetch("/api/leads/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         signal: controller.signal,
         body: JSON.stringify({
+          requestId: attemptId,
           businessType: job.businessType,
           location: job.location,
           limit: job.requestedLeads,
@@ -221,7 +238,6 @@ class SearchManager {
         newIds.push(uniqueId);
       }
 
-      this.consumeUsage(newIds.length);
       this.updateJob(id, {
         provider: payload.provider,
         status: "completed",
@@ -247,6 +263,7 @@ class SearchManager {
       });
     } finally {
       this.controllers.delete(id);
+      void usageManager.refresh();
       this.advanceQueue();
     }
   }
@@ -285,6 +302,7 @@ class SearchManager {
     // Retry the same job so search history does not accumulate duplicate
     // records. The next queue slot starts exactly one new provider request.
     this.updateJob(id, {
+      attemptId: newAttemptId(),
       status: "queued",
       completedAt: null,
       progress: job.processedLeads > 0 ? job.progress : 0,
@@ -293,13 +311,6 @@ class SearchManager {
     });
     this.advanceQueue();
     return this.getSearch(id) ?? null;
-  }
-
-  private consumeUsage(count: number) {
-    if (count <= 0) return;
-    const usage = storage.getUsage();
-    usage.used = Math.min(usage.limit, usage.used + count);
-    storage.setUsage(usage);
   }
 
   getStats() {

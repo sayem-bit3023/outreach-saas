@@ -27,9 +27,12 @@ class ProviderRouter {
     return mockLeadProvider;
   }
 
-  async search(params: LeadProviderSearchParams): Promise<ProviderSearchResult> {
+  async search(
+    params: LeadProviderSearchParams,
+    signal?: AbortSignal
+  ): Promise<ProviderSearchResult> {
     const provider = this.getProvider();
-    const leads = await provider.search(params);
+    const leads = await provider.search(params, signal);
     return {
       provider: provider.getName(),
       leads,

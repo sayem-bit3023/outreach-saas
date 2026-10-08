@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BusinessType, SearchBrief, QualificationStyle } from "@/lib/providers/types";
 import { useSearches } from "@/lib/hooks/use-search";
@@ -35,7 +35,8 @@ const BUSINESS_TYPES: BusinessType[] = [
 export function SearchForm() {
   const router = useRouter();
   const { createSearch } = useSearches();
-  const { remaining, canAfford } = useUsage();
+  const { remaining, loading: usageLoading, error: usageError } = useUsage();
+  const submitLock = useRef(false);
 
   const [businessType, setBusinessType] = useState("");
   const [customType, setCustomType] = useState("");
@@ -67,8 +68,10 @@ export function SearchForm() {
     if (!location.trim()) return "Please enter a location.";
     if (businessType === "Custom" && !customType.trim()) return "Please enter a custom business type.";
     if (!isAllowedResultCount(requestedLeads)) return `Choose one of these result counts: ${RESULT_COUNT_OPTIONS.join(", ")}.`;
+    if (usageLoading) return "Checking your lifetime discovery allowance. Please wait.";
+    if (usageError) return usageError;
     if (remaining < MIN_LEAD_COUNT) return `You need at least ${MIN_LEAD_COUNT} lead discoveries to search, but you have ${remaining} remaining.`;
-    if (!canAfford(requestedLeads)) return `You only have ${remaining} lead discoveries remaining.`;
+    if (remaining < requestedLeads) return `This search requests ${requestedLeads} discoveries, but you have ${remaining} remaining. Choose a smaller result count.`;
     return null;
   };
 
@@ -84,6 +87,7 @@ export function SearchForm() {
   };
 
   const handleFindLeads = () => {
+    if (submitLock.current) return;
     const validationError = validateSearchInput();
     if (validationError) {
       setError(validationError);
@@ -103,23 +107,22 @@ export function SearchForm() {
       additionalInstruction: preferences.additionalInstruction?.trim() || undefined,
     };
 
+    submitLock.current = true;
     setSubmitting(true);
-    storage.setBriefPreferences({
-      goal: brief.goal,
-      priorities: brief.priorities,
-      qualificationStyle: brief.qualificationStyle,
-      additionalInstruction: brief.additionalInstruction,
-    });
-    const job = createSearch(effectiveType, location.trim(), leadCount, brief);
-    router.push(`/searches/${job.id}`);
-  };
-
-  const reduceSize = () => {
-    const affordableOptions = RESULT_COUNT_OPTIONS.filter((count) => count <= remaining);
-    const suggestedCount = affordableOptions[affordableOptions.length - 1];
-    if (suggestedCount === undefined) return;
-    setRequestedLeads(suggestedCount);
-    setError(null);
+    try {
+      storage.setBriefPreferences({
+        goal: brief.goal,
+        priorities: brief.priorities,
+        qualificationStyle: brief.qualificationStyle,
+        additionalInstruction: brief.additionalInstruction,
+      });
+      const job = createSearch(effectiveType, location.trim(), leadCount, brief);
+      router.push(`/searches/${job.id}`);
+    } catch {
+      submitLock.current = false;
+      setSubmitting(false);
+      setError("The search could not be started. Please try again.");
+    }
   };
 
   const togglePriority = (priority: string) => {
@@ -232,10 +235,10 @@ export function SearchForm() {
           <select id="result-count" required value={requestedLeads} onChange={(e) => { setRequestedLeads(Number(e.target.value)); setError(null); }} className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10">
             {RESULT_COUNT_OPTIONS.map((count) => <option key={count} value={count}>{count} results</option>)}
           </select>
-          <p className="mt-2 text-xs text-slate-500">One search requests this many businesses; the provider may return fewer if fewer matches are available. You have {remaining} lead discoveries remaining.</p>
+          <p className="mt-2 text-xs text-slate-500">One search requests this many businesses; the provider may return fewer if fewer matches are available. {usageLoading ? "Checking your lifetime allowance…" : usageError ? usageError : `You have ${remaining} of 100 lifetime discoveries remaining. Choose a count no greater than your remaining allowance; otherwise no provider request will be made.`}</p>
         </div>
 
-        {error && <div className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><div className="flex-1"><p className="text-sm text-amber-800">{error}</p>{!canAfford(requestedLeads) && remaining >= MIN_LEAD_COUNT && <div className="mt-2 flex gap-2"><button type="button" onClick={reduceSize} className="text-xs font-medium text-amber-800 underline">Reduce Search Size</button><button type="button" disabled className="text-xs font-medium text-slate-500">View Plan</button></div>}</div></div>}
+        {error && <div role="alert" className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><p className="text-sm text-amber-800">{error}</p></div>}
 
         <button type="submit" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-sm font-medium text-white transition-colors hover:bg-slate-800"><ArrowRight className="h-4 w-4" /> Continue</button>
       </div>

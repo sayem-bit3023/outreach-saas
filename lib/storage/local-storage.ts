@@ -2,7 +2,6 @@ import {
   SearchJob,
   Lead,
   SavedLead,
-  UsageState,
   SearchBrief,
 } from "@/lib/providers/types";
 
@@ -10,7 +9,7 @@ const KEYS = {
   searches: "li_searches",
   leads: "li_leads",
   saved: "li_saved_leads",
-  usage: "li_usage",
+  legacyUsage: "li_usage",
   briefPreferences: "li_search_brief_preferences",
 } as const;
 
@@ -59,22 +58,6 @@ export const storage = {
   setSavedLeads(saved: SavedLead[]): void {
     if (typeof window === "undefined") return;
     localStorage.setItem(KEYS.saved, JSON.stringify(saved));
-  },
-
-  getUsage(): UsageState {
-    if (typeof window === "undefined") {
-      return { used: 0, limit: 100, plan: "free" };
-    }
-    return safeParse(localStorage.getItem(KEYS.usage), {
-      used: 0,
-      limit: 100,
-      plan: "free" as const,
-    });
-  },
-
-  setUsage(usage: UsageState): void {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(KEYS.usage, JSON.stringify(usage));
   },
 
   getBriefPreferences(): Pick<SearchBrief, "goal" | "priorities" | "qualificationStyle" | "additionalInstruction"> {

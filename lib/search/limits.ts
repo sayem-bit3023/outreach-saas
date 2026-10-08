@@ -1,4 +1,4 @@
-export const RESULT_COUNT_OPTIONS = [5, 10, 25, 50, 100, 250] as const;
+export const RESULT_COUNT_OPTIONS = [5, 10, 25, 50, 100] as const;
 export type ResultCountOption = (typeof RESULT_COUNT_OPTIONS)[number];
 
 export const DEFAULT_RESULT_COUNT: ResultCountOption = 25;

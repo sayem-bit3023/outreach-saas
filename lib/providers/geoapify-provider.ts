@@ -180,11 +180,14 @@ function normalizeLead(
   };
 }
 
-async function fetchJson<T>(url: URL): Promise<T> {
+async function fetchJson<T>(url: URL, signal?: AbortSignal): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url, { cache: "no-store" });
-  } catch {
+    response = await fetch(url, { cache: "no-store", signal });
+  } catch (error) {
+    if (signal?.aborted || (error instanceof Error && error.name === "AbortError")) {
+      throw error;
+    }
     throw new GeoapifyProviderError(
       "The lead provider could not be reached. Please try again.",
       502,
@@ -230,7 +233,7 @@ export class GeoapifyProvider implements LeadProvider {
     return "Geoapify";
   }
 
-  async search(params: LeadProviderSearchParams): Promise<Lead[]> {
+  async search(params: LeadProviderSearchParams, signal?: AbortSignal): Promise<Lead[]> {
     const apiKey = process.env.GEOAPIFY_API_KEY;
     if (!apiKey) {
       throw new GeoapifyProviderError(
@@ -249,7 +252,8 @@ export class GeoapifyProvider implements LeadProvider {
     geocodeUrl.searchParams.set("apiKey", apiKey);
 
     const geocode = await fetchJson<{ results?: GeoapifyGeocodeResult[] }>(
-      geocodeUrl
+      geocodeUrl,
+      signal
     );
     const location = geocode.results?.[0];
     if (!location || typeof location.lat !== "number" || typeof location.lon !== "number") {
@@ -270,12 +274,12 @@ export class GeoapifyProvider implements LeadProvider {
       "bias",
       `proximity:${location.lon},${location.lat}`
     );
-    placesUrl.searchParams.set("limit", String(Math.min(params.limit, 250)));
+    placesUrl.searchParams.set("limit", String(params.limit));
     placesUrl.searchParams.set("offset", String(params.offset ?? 0));
     placesUrl.searchParams.set("lang", "en");
     placesUrl.searchParams.set("apiKey", apiKey);
 
-    const places = await fetchJson<GeoapifyPlacesResponse>(placesUrl);
+    const places = await fetchJson<GeoapifyPlacesResponse>(placesUrl, signal);
     const seen = new Set<string>();
     const leads: Lead[] = [];
 

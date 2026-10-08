@@ -52,6 +52,7 @@ export interface Lead {
 
 export interface SearchJob {
   id: string;
+  attemptId: string;
   businessType: string;
   location: string;
   requestedLeads: number;
@@ -78,8 +79,12 @@ export interface SavedLead {
 
 export interface UsageState {
   used: number;
+  reserved: number;
+  remaining: number;
   limit: number;
   plan: "free";
+  loading: boolean;
+  error?: string;
 }
 
 export interface LeadProviderSearchParams {
@@ -98,6 +103,6 @@ export interface ProviderSearchResult {
 }
 
 export interface LeadProvider {
-  search(params: LeadProviderSearchParams): Promise<Lead[]>;
+  search(params: LeadProviderSearchParams, signal?: AbortSignal): Promise<Lead[]>;
   getName(): string;
 }
