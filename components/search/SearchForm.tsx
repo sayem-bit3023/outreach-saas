@@ -15,7 +15,12 @@ import {
   QUALIFICATION_STYLES,
 } from "@/lib/search-brief";
 import { Search, AlertCircle, ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { MIN_LEAD_COUNT, MAX_LEAD_COUNT } from "@/lib/search/limits";
+import {
+  DEFAULT_RESULT_COUNT,
+  isAllowedResultCount,
+  MIN_LEAD_COUNT,
+  RESULT_COUNT_OPTIONS,
+} from "@/lib/search/limits";
 
 const BUSINESS_TYPES: BusinessType[] = [
   "Dentist",
@@ -35,7 +40,7 @@ export function SearchForm() {
   const [businessType, setBusinessType] = useState("");
   const [customType, setCustomType] = useState("");
   const [location, setLocation] = useState("");
-  const [requestedLeads, setRequestedLeads] = useState<number | "">("");
+  const [requestedLeads, setRequestedLeads] = useState<number>(DEFAULT_RESULT_COUNT);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [briefStep, setBriefStep] = useState(false);
@@ -61,7 +66,7 @@ export function SearchForm() {
     if (!businessType) return "Please choose a business type.";
     if (!location.trim()) return "Please enter a location.";
     if (businessType === "Custom" && !customType.trim()) return "Please enter a custom business type.";
-    if (requestedLeads === "" || !Number.isInteger(requestedLeads) || requestedLeads < MIN_LEAD_COUNT || requestedLeads > MAX_LEAD_COUNT) return `Enter a lead count between ${MIN_LEAD_COUNT} and ${MAX_LEAD_COUNT}.`;
+    if (!isAllowedResultCount(requestedLeads)) return `Choose one of these result counts: ${RESULT_COUNT_OPTIONS.join(", ")}.`;
     if (remaining < MIN_LEAD_COUNT) return `You need at least ${MIN_LEAD_COUNT} lead discoveries to search, but you have ${remaining} remaining.`;
     if (!canAfford(requestedLeads)) return `You only have ${remaining} lead discoveries remaining.`;
     return null;
@@ -110,10 +115,11 @@ export function SearchForm() {
   };
 
   const reduceSize = () => {
-    if (remaining > 0) {
-      setRequestedLeads(Math.min(remaining, MAX_LEAD_COUNT));
-      setError(null);
-    }
+    const affordableOptions = RESULT_COUNT_OPTIONS.filter((count) => count <= remaining);
+    const suggestedCount = affordableOptions[affordableOptions.length - 1];
+    if (suggestedCount === undefined) return;
+    setRequestedLeads(suggestedCount);
+    setError(null);
   };
 
   const togglePriority = (priority: string) => {
@@ -192,7 +198,7 @@ export function SearchForm() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Review Brief</p>
-              <p className="mt-1 text-sm text-slate-700"><span className="font-medium text-slate-800">{effectiveType}</span> in <span className="font-medium text-slate-800">{location.trim()}</span> · {requestedLeads} leads</p>
+              <p className="mt-1 text-sm text-slate-700"><span className="font-medium text-slate-800">{effectiveType}</span> in <span className="font-medium text-slate-800">{location.trim()}</span> · {requestedLeads} results requested</p>
               <p className="mt-1 text-xs text-slate-500">{preferences.qualificationStyle || "Balanced"} · {currentPriorities.length ? currentPriorities.join(" · ") : "No priorities selected"}</p>
             </div>
             <button type="button" onClick={handleFindLeads} disabled={submitting} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60">
@@ -222,12 +228,14 @@ export function SearchForm() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">Number of Leads</label>
-          <input required type="number" min={MIN_LEAD_COUNT} max={MAX_LEAD_COUNT} value={requestedLeads} onChange={(e) => { setRequestedLeads(e.target.value ? Number(e.target.value) : ""); setError(null); }} placeholder={`Enter a count (${MIN_LEAD_COUNT}–${MAX_LEAD_COUNT})`} className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10" />
-          <p className="mt-2 text-xs text-slate-500">Choose between {MIN_LEAD_COUNT} and {MAX_LEAD_COUNT} lead discoveries for this search. You have {remaining} remaining.</p>
+          <label htmlFor="result-count" className="mb-1.5 block text-sm font-medium text-slate-700">Results per search</label>
+          <select id="result-count" required value={requestedLeads} onChange={(e) => { setRequestedLeads(Number(e.target.value)); setError(null); }} className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10">
+            {RESULT_COUNT_OPTIONS.map((count) => <option key={count} value={count}>{count} results</option>)}
+          </select>
+          <p className="mt-2 text-xs text-slate-500">One search requests this many businesses; the provider may return fewer if fewer matches are available. You have {remaining} lead discoveries remaining.</p>
         </div>
 
-        {error && <div className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><div className="flex-1"><p className="text-sm text-amber-800">{error}</p>{requestedLeads !== "" && !canAfford(requestedLeads) && remaining >= MIN_LEAD_COUNT && <div className="mt-2 flex gap-2"><button type="button" onClick={reduceSize} className="text-xs font-medium text-amber-800 underline">Reduce Search Size</button><button type="button" disabled className="text-xs font-medium text-slate-500">View Plan</button></div>}</div></div>}
+        {error && <div className="flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 p-3"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /><div className="flex-1"><p className="text-sm text-amber-800">{error}</p>{!canAfford(requestedLeads) && remaining >= MIN_LEAD_COUNT && <div className="mt-2 flex gap-2"><button type="button" onClick={reduceSize} className="text-xs font-medium text-amber-800 underline">Reduce Search Size</button><button type="button" disabled className="text-xs font-medium text-slate-500">View Plan</button></div>}</div></div>}
 
         <button type="submit" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-sm font-medium text-white transition-colors hover:bg-slate-800"><ArrowRight className="h-4 w-4" /> Continue</button>
       </div>
