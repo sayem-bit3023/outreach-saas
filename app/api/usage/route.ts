@@ -19,13 +19,13 @@ export async function GET() {
     }
 
     const { data: userResult, error: userError } = await supabase.auth.getUser();
-    if (userError) {
+    if (userError && userError.name !== "AuthSessionMissingError") {
       console.error("[api/usage] Supabase authentication check failed.", {
         code: userError.code ?? "unknown",
       });
       return response({ error: { message: "Usage authentication could not be verified." } }, 503);
     }
-    if (!userResult.user) {
+    if (!userResult?.user) {
       return response({ error: { message: "Please sign in to view usage." } }, 401);
     }
 
